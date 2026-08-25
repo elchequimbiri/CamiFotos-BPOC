@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getGalleries } from '../../lib/galleries';
+import { logAccess } from '../../lib/stats';
+
+const session = Astro.locals.session;
+const galleries = getGalleries();
+
+if (session) {
+  logAccess(session.role, 'view_galleries', 'Gallery listing');
+}
+---
+
+<BaseLayout title="Cami Fotos - Galleries">
+  <div class="galleries-page">
+    <div class="galleries-header">
+      <h1>Galleries</h1>
+      <p>{galleries.length} {galleries.length === 1 ? 'gallery' : 'galleries'} available</p>
+    </div>
+    <div class="galleries-grid">
+      {galleries.map((gallery) => (
+        <a href={`/gallery/${gallery.slug}`} class="gallery-card">
+          <div class="gallery-thumb">
+            {gallery.thumbnail ? (
+              <img src={gallery.thumbnail} alt={gallery.name} loading="lazy" />
+            ) : (
+              <div class="gallery-empty">
+                <span>No photos</span>
+              </div>
+            )}
+          </div>
+          <div class="gallery-info">
+            <h2 class="gallery-name">{gallery.name}</h2>
+            <span class="gallery-count">{gallery.imageCount} photos</span>
+          </div>
+        </a>
+      ))}
+      {galleries.length === 0 && (
+        <div class="empty-state">
+          <p>No galleries yet.</p>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .galleries-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .galleries-header {
+    margin-bottom: 2rem;
+  }
+
+  .galleries-header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .galleries-header p {
+    font-size: 0.85rem;
+    opacity: 0.4;
+  }
+
+  .galleries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .gallery-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .gallery-thumb {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .gallery-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .gallery-card:hover .gallery-thumb img {
+    transform: scale(1.03);
+  }
+
+  .gallery-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    font-size: 0.85rem;
+  }
+
+  .gallery-info {
+    padding: 1rem 1.2rem;
+  }
+
+  .gallery-name {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+  }
+
+  .gallery-count {
+    font-size: 0.8rem;
+    opacity: 0.4;
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    opacity: 0.4;
+  }
+
+  @media (max-width: 640px) {
+    .galleries-page {
+      padding: 1rem;
+    }
+
+    .galleries-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>

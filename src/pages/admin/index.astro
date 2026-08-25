@@ -1,0 +1,333 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getGalleries } from '../../lib/galleries';
+
+const galleries = getGalleries();
+---
+
+<BaseLayout title="Administration - Cami Fotos">
+  <div class="admin-page">
+    <div class="admin-header">
+      <h1>Administration Panel</h1>
+    </div>
+
+    <div class="admin-section">
+      <h2>Create Gallery</h2>
+      <form id="createForm" class="admin-form">
+        <input type="text" id="newGallerySlug" placeholder="Gallery folder name (e.g. 2024Vacaciones)" required class="admin-input" />
+        <button type="submit" class="admin-button">Create</button>
+      </form>
+    </div>
+
+    <div class="admin-section">
+      <h2>Galleries</h2>
+      <div class="admin-galleries">
+        {galleries.map((gallery) => (
+          <div class="admin-gallery-item" data-slug={gallery.slug}>
+            <div class="gallery-item-info">
+              <span class="gallery-item-name">{gallery.slug}</span>
+              <span class="gallery-item-count">{gallery.imageCount} photos</span>
+            </div>
+            <div class="gallery-item-actions">
+              <form class="rename-form" data-slug={gallery.slug}>
+                <input type="text" class="admin-input-sm" placeholder="New name" />
+                <button type="submit" class="admin-button-sm">Rename</button>
+              </form>
+              <button class="admin-button-sm admin-button-danger delete-btn" data-slug={gallery.slug}>Delete</button>
+            </div>
+            <div class="gallery-item-upload">
+              <form class="upload-form" data-gallery={gallery.slug}>
+                <input type="file" class="admin-file-input" multiple accept="image/*" />
+                <button type="submit" class="admin-button-sm">Upload Photos</button>
+              </form>
+            </div>
+          </div>
+        ))}
+        {galleries.length === 0 && (
+          <p class="empty-msg">No galleries yet. Create one above.</p>
+        )}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .admin-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .admin-header {
+    margin-bottom: 2rem;
+  }
+
+  .admin-header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .admin-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .admin-section h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  .admin-form {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .admin-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+  }
+
+  .admin-input:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .admin-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .admin-button {
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .admin-button:hover {
+    opacity: 0.85;
+  }
+
+  .admin-gallery-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .gallery-item-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .gallery-item-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .gallery-item-count {
+    font-size: 0.8rem;
+    opacity: 0.4;
+  }
+
+  .gallery-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .rename-form {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .admin-input-sm {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.8rem;
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+  }
+
+  .admin-button-sm {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .admin-button-sm:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .admin-button-danger {
+    border-color: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+  }
+
+  .admin-button-danger:hover {
+    background: rgba(231, 76, 60, 0.15);
+  }
+
+  .gallery-item-upload {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 0.75rem;
+  }
+
+  .upload-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .admin-file-input {
+    flex: 1;
+    font-size: 0.8rem;
+    color: #fff;
+  }
+
+  .empty-msg {
+    opacity: 0.4;
+    font-size: 0.9rem;
+  }
+
+  .status-msg {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 640px) {
+    .admin-page {
+      padding: 1rem;
+    }
+
+    .admin-form {
+      flex-direction: column;
+    }
+
+    .gallery-item-actions {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  // Create gallery
+  document.getElementById('createForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('newGallerySlug') as HTMLInputElement;
+    const slug = input.value.trim();
+    if (!slug) return;
+
+    const res = await fetch('/api/gallery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', slug }),
+    });
+
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      alert('Failed to create gallery. It may already exist.');
+    }
+  });
+
+  // Rename gallery
+  document.querySelectorAll('.rename-form').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const slug = (form as HTMLElement).dataset.slug;
+      const input = form.querySelector('input') as HTMLInputElement;
+      const newName = input.value.trim();
+      if (!slug || !newName) return;
+
+      const res = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'rename', slug, newName }),
+      });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Failed to rename gallery.');
+      }
+    });
+  });
+
+  // Delete gallery
+  document.querySelectorAll('.delete-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const slug = btn.getAttribute('data-slug');
+      if (!slug || !confirm(`Delete gallery "${slug}"? This cannot be undone.`)) return;
+
+      const res = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', slug }),
+      });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Failed to delete gallery.');
+      }
+    });
+  });
+
+  // Upload photos
+  document.querySelectorAll('.upload-form').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const gallery = (form as HTMLElement).dataset.gallery;
+      const fileInput = form.querySelector('input[type="file"]') as HTMLInputElement;
+      if (!gallery || !fileInput?.files?.length) return;
+
+      const formData = new FormData();
+      formData.set('gallery', gallery);
+      for (const file of fileInput.files) {
+        formData.append('photos', file);
+      }
+
+      const btn = form.querySelector('button') as HTMLButtonElement;
+      btn.textContent = 'Uploading...';
+      btn.disabled = true;
+
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert('Failed to upload photos.');
+        btn.textContent = 'Upload Photos';
+        btn.disabled = false;
+      }
+    });
+  });
+</script>

@@ -1,0 +1,220 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const session = Astro.locals.session;
+if (session) {
+  return Astro.redirect('/gallery');
+}
+---
+
+<BaseLayout title="Cami Fotos">
+  <div class="login-page">
+    <div class="login-bg">
+      <img src="/recursos/portada.jpg" alt="Cover" class="cover-image" />
+      <div class="cover-overlay"></div>
+    </div>
+    <div class="login-container">
+      <div class="login-card">
+        <h1 class="login-title">Cami Fotos</h1>
+        <p class="login-subtitle">A story in images</p>
+        <form id="loginForm" class="login-form">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            required
+            autocomplete="current-password"
+            class="login-input"
+          />
+          <p id="errorMsg" class="error-msg"></p>
+          <button type="submit" class="login-button">Enter the gallery</button>
+        </form>
+        <div class="access-modes">
+          <p class="modes-label">Access modes:</p>
+          <div class="modes-list">
+            <span class="mode-tag">Family</span>
+            <span class="mode-tag">Administration</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .login-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  .login-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cover-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.85) 100%);
+  }
+
+  .login-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+  }
+
+  .login-card {
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 2.5rem;
+  }
+
+  .login-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.02em;
+  }
+
+  .login-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .login-input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-input:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .login-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .login-button {
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .login-button:hover {
+    opacity: 0.85;
+  }
+
+  .error-msg {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    min-height: 1.2em;
+  }
+
+  .access-modes {
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .modes-label {
+    font-size: 0.75rem;
+    opacity: 0.4;
+    margin-bottom: 0.5rem;
+  }
+
+  .modes-list {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .mode-tag {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 640px) {
+    .login-page {
+      justify-content: center;
+    }
+
+    .login-container {
+      max-width: 100%;
+      padding: 1.5rem;
+    }
+
+    .login-card {
+      padding: 2rem;
+    }
+
+    .cover-overlay {
+      background: rgba(0,0,0,0.7);
+    }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  const errorMsg = document.getElementById('errorMsg') as HTMLElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.textContent = '';
+
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    const formData = new FormData();
+    formData.set('password', password);
+
+    try {
+      const res = await fetch('/api/login', { method: 'POST', body: formData });
+      if (res.ok) {
+        window.location.href = '/gallery';
+      } else {
+        errorMsg.textContent = 'Invalid password. Please try again.';
+      }
+    } catch {
+      errorMsg.textContent = 'Connection error. Please try again.';
+    }
+  });
+</script>
